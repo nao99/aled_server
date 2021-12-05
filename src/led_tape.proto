@@ -1,0 +1,11 @@
+syntax = "proto3";
+
+message LedTape {
+    message Diode {
+        int32 id = 1;
+        int32 hue = 2;
+        int32 saturation = 3;
+    }
+
+    repeated Diode diodes = 1;
+}
