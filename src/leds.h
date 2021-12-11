@@ -10,7 +10,7 @@
 #define LOGICAL_TAPE_PIN_NUMBER 5
 
 #define DIODES_COUNT 180
-#define DIODES_BRIGHTNESS 128
+#define DIODES_BRIGHTNESS 205
 
 /**
  * Disables a LED tape
