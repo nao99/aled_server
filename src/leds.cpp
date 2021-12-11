@@ -14,6 +14,8 @@ void initializeTape(CRGB* diodes, int diodesBrightness, int diodesCount) {
     LEDS.setBrightness(diodesBrightness);
     LEDS.addLeds<WS2812, LOGICAL_TAPE_PIN_NUMBER, GRB>(diodes, diodesCount);
 
+    LEDS.setMaxPowerInVoltsAndMilliamps(DIODES_MAX_POWER_IN_VOLTS, DIODES_MAX_POWER_IN_MILLIAMPS);
+
     disableLedTape(diodes, diodesCount);
     updateLedTape();
 }

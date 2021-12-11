@@ -12,6 +12,9 @@
 #define DIODES_COUNT 180
 #define DIODES_BRIGHTNESS 205
 
+#define DIODES_MAX_POWER_IN_VOLTS 5
+#define DIODES_MAX_POWER_IN_MILLIAMPS 1500
+
 /**
  * Disables a LED tape
  * In fact, disables each diode in the tape
