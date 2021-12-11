@@ -24,6 +24,11 @@ void changeDiodeColor(CRGB* diodes, int id, int hue, int saturation) {
     diodes[id] = CHSV(hue, saturation, DIODES_BRIGHTNESS);
 }
 
+void setLedTapeColor(CRGB* diodes, int diodesCount, const struct CRGB& color) {
+    fill_solid(diodes, diodesCount, color);
+    updateLedTape();
+}
+
 void updateLedTape() {
     LEDS.show();
 }

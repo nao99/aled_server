@@ -19,7 +19,7 @@
  * Disables a LED tape
  * In fact, disables each diode in the tape
  *
- * @param diodes      an array of diodes
+ * @param diodes      a tape of diodes
  * @param diodesCount a count of diodes in the tape
  */
 extern void disableLedTape(CRGB* diodes, int diodesCount);
@@ -27,7 +27,7 @@ extern void disableLedTape(CRGB* diodes, int diodesCount);
 /**
  * Initializes a LED tape
  *
- * @param diodes           tape diodes
+ * @param diodes           a tape of diodes
  * @param diodesBrightness a maximal diodes brightness
  * @param diodesCount      a diodes count in the tape
  */
@@ -36,12 +36,22 @@ extern void initializeTape(CRGB* diodes, int diodesBrightness, int diodesCount);
 /**
  * Changes diode color
  *
- * @param diodes     tape diodes
+ * @param diodes     a tape of diodes
  * @param id         a diode's id
  * @param hue        a color's hue
  * @param saturation a color's saturation
  */
 extern void changeDiodeColor(CRGB* diodes, int id, int hue, int saturation);
+
+/**
+ * Sets YellowGreen color for all LED tape
+ * @link https://github.com/FastLED/FastLED/wiki/Pixel-reference
+ *
+ * @param diodes      a tape of diodes
+ * @param diodesCount a count of diodes in the tape
+ * @param color       a predefined color
+ */
+extern void setLedTapeColor(CRGB* diodes, int diodesCount, const struct CRGB& color);
 
 /**
  * Updates LED tape

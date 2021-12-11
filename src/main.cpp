@@ -14,25 +14,31 @@ extern bool decodeLedTapeDiodesAndLightThem(pb_istream_t* stream, const pb_field
 struct CRGB diodes[DIODES_COUNT];
 WiFiServer wifiServer(WI_FI_LISTEN_PORT);
 
+bool connectedToWiFi = false;
+
 void setup() {
     // 0. Initialize Arduino Serial
     initializeArduinoSerial();
     Serial.println("Starting ALED project");
 
-    // 1. Initialize Arduino Flash Memory
+    // 1. Initialize LED's tape and set OliveDrab color
+    initializeTape(diodes, DIODES_BRIGHTNESS, DIODES_COUNT);
+    setLedTapeColor(diodes, DIODES_COUNT, CRGB::OliveDrab);
+
+    // 2. Initialize Arduino Flash Memory
     int memoryCount = MAX_WI_FI_SSID_LENGTH + MAX_WI_FI_PASSWORD_LENGTH + 2;
     initializeMemory(memoryCount);
 
-    // 2. Connect to a Wi-Fi network
+    // 3. Connect to a Wi-Fi network
     WiFiCredentials credentials {
         .ssid = {""},
         .password = {""}
     };
 
-    // 2.1. Retrieve Wi-Fi credentials
+    // 3.1. Retrieve Wi-Fi credentials
     bool credentialsRetrieved = retrieveWiFiCredentials(&credentials);
 
-    // 2.2. Enter credentials via Serial
+    // 3.2. Enter credentials via Serial
     if (!credentialsRetrieved) {
         enterWiFiCredentials(&credentials);
 
@@ -46,26 +52,26 @@ void setup() {
     const IPAddress* local_gateway = new IPAddress(192, 168, 0, 1);
     const IPAddress* local_subnet = new IPAddress(255, 255, 0, 0);
 
-    // 2.3. Try to connect to Wi-Fi network
-    bool connectionEstablished = connectToWiFi(&credentials, local_ip_address, local_gateway, local_subnet);
-
-    if (!connectionEstablished) {
-        exit(1);
+    // 3.3. Try to connect to Wi-Fi network
+    connectedToWiFi = connectToWiFi(&credentials, local_ip_address, local_gateway, local_subnet);
+    if (!connectedToWiFi) {
+        return;
     }
 
-    // 2.4. Save credentials in Arduino Flash Memory
+    // 3.4. Save credentials in Arduino Flash Memory
     if (!credentialsRetrieved) {
         updateWiFiCredentials(&credentials);
     }
 
-    // 3. Start Listening Server
+    // 4. Start Listening Server
     startListeningServer(&wifiServer);
-
-    // 4. Initialize LEDs
-    initializeTape(diodes, DIODES_BRIGHTNESS, DIODES_COUNT);
 }
 
 void loop() {
+    if (!connectedToWiFi) {
+        return;
+    }
+
     WiFiClient client = wifiServer.available();
     if (client.available() == 0 && !client.connected()) {
         return;
