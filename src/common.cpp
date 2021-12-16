@@ -8,25 +8,18 @@ void initializeArduinoSerial() {
     Serial.begin(SERIAL_BAUDRATE);
 }
 
-int getSizeSubarrayUntilTerminatingSymbol(char symbols[], char terminatingSymbol) {
-    size_t symbolsLength = strlen(symbols);
+int parseFirstInteger(Stream& stream) {
+    int parsedInteger = 0;
 
-    int subarrayLength = 0;
-    for (int i = 0; i < symbolsLength; i++) {
-        if (symbols[i] == terminatingSymbol) {
-            break;
-        }
+    int byte1 = stream.read();
+    int byte2 = stream.read();
+    int byte3 = stream.read();
+    int byte4 = stream.read();
 
-        subarrayLength++;
-    }
+    parsedInteger = byte4 | parsedInteger;
+    parsedInteger = byte3 << 8 | parsedInteger;
+    parsedInteger = byte2 << 16 | parsedInteger;
+    parsedInteger = byte1 << 24 | parsedInteger;
 
-    return subarrayLength;
-}
-
-void copy(const char from[], char to[], int startIndex, int endIndex) {
-    int j = 0;
-    for (int i = startIndex; i < endIndex; i++) {
-        to[j] = from[i];
-        j++;
-    }
+    return parsedInteger;
 }

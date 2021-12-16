@@ -2,7 +2,6 @@ add_executable(COMMON src/common.cpp src/common.h)
 add_executable(MEMORY src/memory.cpp src/memory.h)
 add_executable(WIFI src/wifi.cpp src/wifi.h)
 add_executable(LEDS src/leds.cpp src/leds.h)
-add_executable(STREAM src/stream.cpp src/stream.h)
 
 add_library(
     EEPROM

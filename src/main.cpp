@@ -3,16 +3,29 @@
 #include "common.h"
 #include "wifi.h"
 #include "leds.h"
-#include "stream.h"
 
+#include "pb_decode.h"
 #include "led_tape.pb.h"
 
 extern void enterWiFiCredentials(WiFiCredentials* credentials);
 extern bool credentialsValid(WiFiCredentials* credentials);
+
+/**
+ * Decodes incoming LED tape diode bytes
+ * and lights them the tape
+ *
+ * @param stream     a stream to read data
+ * @param diodeField a diode field (unused, but required parameter)
+ * @param arguments  other arguments (unused, but required parameter)
+ *
+ * @return true if all data were read correct or false else
+ */
 extern bool decodeLedTapeDiodesAndLightThem(pb_istream_t* stream, const pb_field_t* diodeField, void** arguments);
 
 struct CRGB diodes[DIODES_COUNT];
+
 WiFiServer wifiServer(WI_FI_LISTEN_PORT);
+WiFiClient wifiClient;
 
 bool connectedToWiFi = false;
 
@@ -72,38 +85,50 @@ void loop() {
         return;
     }
 
-    WiFiClient client = wifiServer.available();
-    if (client.available() == 0 && !client.connected()) {
+    if (!wifiClient.connected()) {
+        wifiClient = wifiServer.available();
         return;
     }
 
-    pb_istream_t clientPbStream = convertStreamToPbIstream(client);
-
-    LedTape ledTape = LedTape_init_default;
-    ledTape.diodes.funcs.decode = decodeLedTapeDiodesAndLightThem;
-
-    // TODO: fix bug when not each data could be read
-    bool decoded = pb_decode(&clientPbStream, LedTape_fields, &ledTape);
-    if (!decoded) {
-        Serial.println("Received led tape data cannot be decoded");
+    size_t bytesAvailable = wifiClient.available();
+    if (bytesAvailable < BYTES_COUNT_TO_GET_LENGTH_OF_LED_TAPE) {
+        return;
     }
 
-    wifiServer.write(0);
-    client.stop();
+    int bytesCountOfLedTape = parseFirstInteger(wifiClient);
+    while (bytesAvailable < bytesCountOfLedTape) {
+        bytesAvailable = wifiClient.available();
+
+        // This method was used specially to avoid any exceptions from NodeMCU
+        // To more understanding @see @link https://forum.arduino.cc/t/soft-wdt-reset-nodemcu/425567
+        yield();
+    }
+
+    uint8_t ledTapeBytes[bytesCountOfLedTape];
+    wifiClient.read(ledTapeBytes, bytesCountOfLedTape);
+
+    LedTape ledTape = LedTape_init_zero;
+    ledTape.diodes.funcs.decode = decodeLedTapeDiodesAndLightThem;
+
+    pb_istream_t stream = pb_istream_from_buffer(ledTapeBytes, bytesCountOfLedTape);
+    bool status = pb_decode(&stream, LedTape_fields, &ledTape);
+
+    if (!status) {
+        Serial.printf("Decoding failed: %s\n", PB_GET_ERROR(&stream));
+        return;
+    }
 
     updateLedTape();
 }
 
 bool decodeLedTapeDiodesAndLightThem(pb_istream_t* stream, const pb_field_t* diodeField, void** arguments) {
-    LedTape_Diode ledTapeDiode = LedTape_Diode_init_default;
+    LedTape_Diode ledTapeDiode = LedTape_Diode_init_zero;
 
     bool decoded = pb_decode(stream, LedTape_Diode_fields, &ledTapeDiode);
     if (!decoded) {
-        Serial.println("Received diode data cannot be decoded");
+        Serial.printf("Received diode data cannot be decoded: %s \n", PB_GET_ERROR(stream));
         return false;
     }
-
-    Serial.printf("Test: %d %d %d \n", ledTapeDiode.id, ledTapeDiode.hue, ledTapeDiode.saturation);
 
     changeDiodeColor(diodes, ledTapeDiode.id, ledTapeDiode.hue, ledTapeDiode.saturation);
 

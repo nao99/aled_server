@@ -7,6 +7,8 @@
 
 #include "FastLED.h"
 
+#define BYTES_COUNT_TO_GET_LENGTH_OF_LED_TAPE 4
+
 #define LOGICAL_TAPE_PIN_NUMBER 5
 
 #define DIODES_COUNT 136
