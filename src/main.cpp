@@ -5,7 +5,7 @@
 #include "leds.h"
 
 #include "pb_decode.h"
-#include "led_tape.pb.h"
+#include "LedTape.pb.h"
 
 extern void enterWiFiCredentials(WiFiCredentials* credentials);
 extern bool credentialsValid(WiFiCredentials* credentials);
@@ -130,7 +130,7 @@ bool decodeLedTapeDiodesAndLightThem(pb_istream_t* stream, const pb_field_t* dio
         return false;
     }
 
-    changeDiodeColor(diodes, ledTapeDiode.id, ledTapeDiode.hue, ledTapeDiode.saturation);
+    changeDiodeColor(diodes, ledTapeDiode.id, ledTapeDiode.r, ledTapeDiode.g, ledTapeDiode.b);
 
     return true;
 }

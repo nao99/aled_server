@@ -20,8 +20,8 @@ void initializeTape(CRGB* diodes, int diodesBrightness, int diodesCount) {
     updateLedTape();
 }
 
-void changeDiodeColor(CRGB* diodes, int id, int hue, int saturation) {
-    diodes[id] = CHSV(hue, saturation, DIODES_BRIGHTNESS);
+void changeDiodeColor(CRGB* diodes, int id, int r, int g, int b) {
+    diodes[id] = CRGB(r, g, b);
 }
 
 void setLedTapeColor(CRGB* diodes, int diodesCount, const struct CRGB& color) {

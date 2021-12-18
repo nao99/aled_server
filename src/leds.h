@@ -38,12 +38,13 @@ extern void initializeTape(CRGB* diodes, int diodesBrightness, int diodesCount);
 /**
  * Changes diode color
  *
- * @param diodes     a tape of diodes
- * @param id         a diode's id
- * @param hue        a color's hue
- * @param saturation a color's saturation
+ * @param diodes a tape of diodes
+ * @param id     a diode's id
+ * @param r      a color R channel
+ * @param g      a color G channel
+ * @param b      a color B channel
  */
-extern void changeDiodeColor(CRGB* diodes, int id, int hue, int saturation);
+extern void changeDiodeColor(CRGB* diodes, int id, int r, int g, int b);
 
 /**
  * Sets YellowGreen color for all LED tape
